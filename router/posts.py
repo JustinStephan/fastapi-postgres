@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 import schemas
 import models
 from database import get_db
@@ -12,9 +13,20 @@ router = APIRouter(
 )
 
 @router.get('/', response_model=List[schemas.CreatePost])
-def test_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db)):
     post = db.query(models.Post).all()
     return post
+
+@router.get('/search', status_code=status.HTTP_200_OK, response_model=List[schemas.CreatePost])
+def search_posts(keyword: str = '', limit: int = 10, db: Session = Depends(get_db)):
+    posts = db.query(models.Post).filter(
+        or_(
+            models.Post.title.contains(keyword),
+            models.Post.content.contains(keyword)
+            )
+        ).limit(limit)
+    return posts
+    
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.CreatePost)
 def create_post(post: schemas.CreatePost, db: Session = Depends(get_db)):
