@@ -12,7 +12,7 @@ router = APIRouter(
     tags=['tags']
 )
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.Car])
+@router.get('/', status_code=status.HTTP_200_OK, response_model=List[schemas.CarOut])
 def get_cars(limit: int = 10, db: Session = Depends(get_db)):
     print('test')
     cars = db.query(models.Car).limit(limit)
@@ -28,7 +28,7 @@ async def import_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
 
         cars = []
         for row in reader:
-            parsed = schemas.Car(**row)
+            parsed = schemas.CarCreate(**row)
             cars.append(models.Car(**parsed.model_dump()))
         
         db.bulk_save_objects(cars)

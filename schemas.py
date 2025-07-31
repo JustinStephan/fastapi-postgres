@@ -11,7 +11,20 @@ class CreatePost(PostBase):
     class Config:
         orm_mode = True
 
-class Car(BaseModel):
+class CarOut(BaseModel):
+    company: str
+    name: str
+    engine: str
+    displacement: str
+    horsepower: int
+    top_speed: int
+    zero_sixty: float
+    price: int
+    fuel_type: str
+    seats: int
+    torque: str
+
+class CarCreate(BaseModel):
     company: str
     name: str
     engine: str
@@ -26,6 +39,8 @@ class Car(BaseModel):
 
     @field_validator('horsepower', mode="before")
     def normalize_horsepower(cls, value: str) -> int:
+        if isinstance(value, int):
+            return value
         if value is None:
             return 0
         try:
@@ -49,6 +64,8 @@ class Car(BaseModel):
         
     @field_validator('top_speed', mode="before")
     def normalize_speed(cls, top_speed: str) -> int:
+        if isinstance(top_speed, int):
+            return top_speed
         if top_speed is None:
             return 0
         
@@ -59,9 +76,10 @@ class Car(BaseModel):
         
     @field_validator('zero_sixty', mode="before")
     def normalize_zero_sixty(cls, zero_sixty: str) -> float:
+        if isinstance(zero_sixty, float):
+            return zero_sixty
         if zero_sixty is None or zero_sixty.lower() == 'n/a':
             return 0.0
-        
         try:
             # Clean the input by removing irrelevant text
             clean_value = (
@@ -85,6 +103,8 @@ class Car(BaseModel):
         
     @field_validator('price', mode="before")
     def normalize_price(cls, price: str) -> int:
+        if isinstance(price, int):
+            return price
         if price is None:
             return 0
         
@@ -102,8 +122,11 @@ class Car(BaseModel):
     
     @field_validator('seats', mode='before')
     def normalize_seats(cls, seats: str) -> int:
+        if isinstance(seats, float):
+            return seats
         if seats is None:
             return 0
+
         try:
             cleaned_seats = seats.lower().strip()
             if '+' in cleaned_seats:
